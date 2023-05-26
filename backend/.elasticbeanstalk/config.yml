@@ -6,7 +6,7 @@ environment-defaults:
     branch: null
     repository: null
 global:
-  application_name: conchayoro
+  application_name: conchayoroapp
   default_ec2_keyname: vockey
   default_platform: Docker
   default_region: us-east-1
