@@ -1,31 +1,32 @@
 name: conchayoro-pipeline
 on:
-  push:
-    branches: [main]
-
-  workflow_dispatch:
-    
+push:
+branches: [main]
+workflow_dispatch:
 env:
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-  AWS_REGION: ${{ vars.AWS_REGION }}
-  PROJECT_NAME: ${{ vars.PROJECT_NAME }}
-  MODULE_NAME: ${{ vars.MODULE_NAME }}
-  TAG: latest
-  STACK_NAME: "64bit Amazon Linux 2 v3.5.7 running Docker"  
-  
+AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+AWS_REGION: ${{ vars.AWS_REGION }}
+PROJECT_NAME: ${{ vars.PROJECT_NAME }}
+MODULE_NAME: ${{ vars.MODULE_NAME }}
+TAG: latest
+STACK_NAME: "64bit Amazon Linux 2 v3.5.7 running Docker"
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '16'
-          cache: 'npm'
-      - run: docker build -t $PROJECT_NAME/$MODULE_NAME $MODULE_NAME/.
-      - run: docker tag $PROJECT_NAME/$MODULE_NAME:$TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$PROJECT_NAME/$MODULE_NAME:$TAG
-      - run: aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
-      - run: docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$PROJECT_NAME/$MODULE_NAME:$TAG
+build:
+runs-on: ubuntu-latest
+steps:
+- uses: actions/checkout@v2
+- uses: actions/setup-node@v3
+with:
+node-version: '16'
+cache: 'npm'
+- run: docker build -t $PROJECT_NAME/$MODULE_NAME $MODULE_NAME/.
+- run: docker tag $PROJECT_NAME/$MODULE_NAME:$TAG
+$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$PROJECT_NAME/$MODULE_NAME:$TAG
+- run: aws ecr get-login-password --region $AWS_REGION | docker login
+--username AWS --password-stdin
+$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+- run: docker push
+$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$PROJECT_NAME/$MODULE_NAME:$TAG
